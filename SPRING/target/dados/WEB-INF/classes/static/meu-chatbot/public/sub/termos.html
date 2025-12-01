@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termos de Uso | Agrosense</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="leaf-bg"></div>
+  <div class="container">
+    <header>
+      <a href="../index.html" style="text-decoration:none;">
+              <div class="logo">
+        <i class="fas fa-seedling"></i>
+        <h1>Agro<span>sense</span></h1>
+      </div>
+      </a>
+      <div class="header-actions">
+        <div class="header-info">
+          <p>Sistema Inteligente de Recomendação Agrícola</p>
+        </div>
+        <div class="theme-toggle-container">
+      <label class="theme-toggle-label" for="themeToggle">Modo Escuro</label>
+      <label class="theme-toggle-btn">
+        <input type="checkbox" id="themeToggle">
+        <span class="theme-toggle-slider"></span>
+      </label>
+    </div>
+      </div>
+    </header>
+    <div class="middle-section" style="max-width:700px;margin:40px auto;">
+      <h2><i class="fas fa-file-contract"></i> Termos de Uso</h2>
+      <p>
+        Ao utilizar o Agrosense, você concorda com os seguintes termos:
+      </p>
+      <ul>
+        <li>As informações fornecidas são para fins informativos e não substituem a orientação de um agrônomo.</li>
+        <li>Não nos responsabilizamos por decisões tomadas com base nas recomendações do sistema.</li>
+        <li>O uso do sistema é gratuito e sujeito a alterações sem aviso prévio.</li>
+      </ul>
+      <p>Em caso de dúvidas, consulte nossa equipe.</p>
+    </div>
+    <footer>
+      <div class="footer-content">
+        <p>Agrosense &copy; 2025</p>
+        <div class="footer-links">
+          <a href="privacidade.html">Política de Privacidade</a>
+          <a href="../index.html">Início</a>
+          <a href="contato.html">Contato</a>
+          <a href="sobre.html">Sobre Nós</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+   <script>
+    // Aplica o modo escuro se estiver salvo no localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+    // Sincroniza o botão com o estado salvo
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.checked = document.body.classList.contains('dark-mode');
+      themeToggle.addEventListener('change', function() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+      });
+    }
+  </script>
+</body>
+</html>

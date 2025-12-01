@@ -1,0 +1,11 @@
+br\com\banco\model\Medicao.class
+br\com\banco\controller\MedicaoRepository.class
+br\com\banco\DadosApplication.class
+br\com\banco\login\LoginRequest.class
+br\com\banco\controller\HistoricoController.class
+br\com\banco\DadosApplication$1.class
+br\com\banco\model\Usuario.class
+br\com\banco\login\LoginResponse.class
+br\com\banco\controller\LoginController.class
+br\com\banco\controller\MedicaoController.class
+br\com\banco\controller\UsuarioRepository.class

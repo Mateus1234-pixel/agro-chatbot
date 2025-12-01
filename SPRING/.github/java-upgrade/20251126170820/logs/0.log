@@ -1,0 +1,54 @@
+2025-11-26T17:08:20.373Z [INFO] ----------------------invoke generate_upgrade_plan----------------------
+2025-11-26T17:08:20.377Z [INFO] [Tool.invoke]({name: generate_upgrade_plan, input: {
+  "projectPath": "c:\\Users\\I2DS\\Documents\\certomuitocerto\\dados",
+  "targetJavaVersion": "21",
+  "useCurrentBranch": false
+}}).
+2025-11-26T17:08:20.380Z [INFO] [Plan.tryStartTask]({tool:generate_upgrade_plan, nextTask:{type:undefined, tool:undefined}}
+2025-11-26T17:08:20.382Z [INFO] [Plan.tryStartTask]: no next task, create new one.
+2025-11-26T17:08:20.385Z [INFO] [Plan.createTaskAtStart]({tool: generate_upgrade_plan, input: {
+  "projectPath": "c:\\Users\\I2DS\\Documents\\certomuitocerto\\dados",
+  "targetJavaVersion": "21",
+  "useCurrentBranch": false,
+  "sessionId": "20251126170820"
+}}).
+2025-11-26T17:08:20.388Z [INFO] [Plan.tryStartTask]: starting task generatePlan
+2025-11-26T17:08:20.391Z [INFO] [Task.start](): Starting task generatePlan
+2025-11-26T17:08:20.394Z [INFO] [Task.start](1): Started task generatePlan
+2025-11-26T17:08:20.405Z [INFO] [Tool.invoke] validate GitHub Copilot license.
+2025-11-26T17:08:20.858Z [INFO] Copilot user info:{
+  "access_type_sku": "free_limited_copilot",
+  "analytics_tracking_id": "ef4df293f32c9085ba8d4e2976f95a06",
+  "assigned_date": "2025-04-07T08:15:02-03:00",
+  "can_signup_for_limited": false,
+  "chat_enabled": true,
+  "copilot_plan": "individual",
+  "organization_login_list": [],
+  "organization_list": [],
+  "limited_user_quotas": {
+    "chat": 310,
+    "completions": 3960
+  },
+  "limited_user_subscribed_day": 7,
+  "limited_user_reset_date": "2025-12-07",
+  "monthly_quotas": {
+    "chat": 500,
+    "completions": 4000
+  }
+}
+2025-11-26T17:08:20.861Z [WARN] "GitHub Copilot app modernization - upgrade for Java" and its tools are only available for GitHub Copilot "Pro", "Pro+", "Business" and "Enterprise" plans.
+2025-11-26T17:08:20.864Z [ERROR] [Tool.invoke] error occurs when invoking tool generate_upgrade_plan: UnsupportedCopilotPlanError: "GitHub Copilot app modernization - upgrade for Java" and its tools are only available for GitHub Copilot "Pro", "Pro+", "Business" and "Enterprise" plans.. Please upgrade your GitHub Copilot plan to use this feature or upgrading this project using other tools you prefer..
+2025-11-26T17:08:20.867Z [INFO] [Task.complete](1): Completing task generatePlan
+2025-11-26T17:08:20.870Z [INFO] ----------------------invoked generate_upgrade_plan----------------------
+2025-11-26T17:08:20.872Z [INFO] [Task.complete](1): Completed task generatePlan
+2025-11-26T17:09:17.708Z [INFO] ---------------------prepare build_java_project----------------------
+2025-11-26T17:09:17.713Z [INFO] [Tool.prepareInvocation]({name: build_java_project, input: {
+  "projectPath": "c:\\Users\\I2DS\\Documents\\certomuitocerto\\dados",
+  "codeChangesMessage": "Update java.version to 21 and configure compiler plugin",
+  "codeChangesDetails": "- Bump `<java.version>` to `21`\n- Configure `maven-compiler-plugin` to use `<release>${java.version}</release>` and set plugin version to `3.11.0`"
+}}).
+2025-11-26T17:09:17.734Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2025-11-26T17:09:17.745Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Build project"
+}}).
+2025-11-26T17:09:17.748Z [INFO] ----------------------prepared build_java_project----------------------

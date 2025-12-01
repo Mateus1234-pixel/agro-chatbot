@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-DadosApplication<dados>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "br.com.banco.DadosApplication",
+            "projectName": "dados",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
