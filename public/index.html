@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agrosense</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="shortcut icon" href="assets/fav-icon.png" type="image/x-icon">
+  <!-- libs para gerar PDF a partir da DOM -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<!-- Botão de voltar ao topo -->
+<button id="btnTopo" title="Voltar ao topo">
+  <i class="fas fa-circle-arrow-up"></i>
+</button>
+
+
+<body>
+
+  <div class="leaf-bg"></div>
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <div class="container">
+    <header>
+      <a href="../index.html" style="text-decoration:none;">
+        <div class="logo">
+          <i class="fas fa-seedling"></i>
+          <h1>Agro<span>sense</span></h1>
+        </div>
+      </a>
+      <div class="header-actions">
+        <button id="historyButton" style=" padding: 10px 20px; background:#2ecc71; color:white; border:none; border-radius:5px; cursor:pointer;">Histórico</button>
+
+        <button id="loginButton" style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">Login</button>
+        <div class="header-info"><p>Sistema Inteligente de Recomendação Agrícola</p></div>
+        <div class="theme-toggle-container">
+          <span class="theme-toggle-label">Modo Escuro</span>
+          <label class="theme-toggle-btn">
+            <input type="checkbox" id="themeToggle">
+            <span class="theme-toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <nav class="anchor-nav">
+  <a href="#localizacao">Localização</a>
+  <a href="#previsao">Previsão do Tempo</a>
+  <a href="#analise-solo">Análise do Solo</a>
+  <a href="#planta">Plantas</a>
+  <a href="#calendario">Calendário</a>
+  <a href="#recomendacao">Recomendações</a>
+</nav>
+
+
+    
+
+    <div class="layout-container">
+      <div class="top-section" id="localizacao">
+        <div class="card">
+          <h2><i class="fas fa-map-marker-alt"></i> Localização</h2>
+          <form id="dataForm">
+            <div class="location-selects">
+              <div class="form-group">
+                <label for="stateSelect">Estado (UF):</label>
+                <select id="stateSelect" required>
+                  <option value="" disabled selected>Selecione seu estado</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="citySelect">Cidade:</label>
+                <select id="citySelect" required disabled>
+                  <option value="" disabled selected>Selecione primeiro o estado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="map-container" id="realMapContainer">
+              <div class="map-placeholder" id="mapPlaceholder">
+                <i class="fas fa-map-marked-alt"></i>
+                <p>Selecione um estado e cidade para visualizar a localização</p>
+              </div>
+              <iframe id="cityMap" style="display:none; width:100%; height:200px; border:0; border-radius:14px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 25px;">
+              <button type="submit" id="analyzeBtn">
+                <i class="fas fa-search" id="analyzeIcon"></i> Analisar Condições
+              </button>
+              <button class="btn-ghost" id="refreshNewsBtn">
+                <i class="fas fa-sync-alt"></i> Atualizar Condições
+              </button>
+                <button id="pdfBtn" style="display:none; padding: 16px 20px; background: red; color:white; border:none; border-radius:12px; cursor:pointer;" aria-label="Gerar PDF">
+    <i class="fas fa-file-pdf"></i>
+  </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card" id="previsao">
+          <h2><i class="fas fa-cloud-sun"></i> Previsão do Tempo</h2>
+          <div class="info-cards" >
+            <div class="info-card">
+              <!-- Temperatura (já está igual — manter) -->
+<h3><i class="fas fa-temperature-high"></i> Temperatura
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre temperatura">i</span>
+    <span class="tooltip-text">Temperatura atual e variação prevista para as próximas 24 horas</span>
+  </div>
+</h3>
+              <p><strong>Atual:</strong> <span id="temp-now">-</span></p>
+              <p><strong>Mín/Máx:</strong> <span id="temp-minmax">-</span></p>
+              <div class="sparkline" id="temp-sparkline">
+                <svg width="100%" height="100%" viewBox="0 0 200 60" preserveAspectRatio="none">
+                  <path class="sparkline-line" d="M0,60 L40,40 L80,20 L120,35 L160,45 L200,30"></path>
+                  <circle class="sparkline-point" cx="40" cy="40" r="3" data-value="22°C" data-time="6h"></circle>
+                </svg>
+                <div class="sparkline-tooltip"></div>
+              </div>
+            </div>
+
+            <div class="info-card">
+<!-- Umidade -->
+<h3><i class="fas fa-tint"></i> Umidade
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre umidade">i</span>
+    <span class="tooltip-text">Umidade relativa do ar e umidade do solo — indica condições de irrigação</span>
+  </div>
+</h3>              <p><strong>Ar:</strong> <span id="humidity-air-w">-</span></p>
+            </div>
+
+            <div class="info-card">
+<!-- Precipitação -->
+<h3><i class="fas fa-cloud-rain"></i> Precipitação
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre precipitação">i</span>
+    <span class="tooltip-text">Probabilidade de chuva nas próximas 24h e total acumulado</span>
+  </div>
+</h3>              <p><strong>Chuva:</strong> <span id="rain-chance">-</span></p>
+              <p><strong>Últimas 24h:</strong> <span id="rain-last">-</span></p>
+            </div>
+
+            <div class="info-card">
+<!-- Vento -->
+<h3><i class="fas fa-wind"></i> Vento
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre vento">i</span>
+    <span class="tooltip-text">Velocidade e direção do vento — importante para pulverização e semeadura</span>
+  </div>
+</h3>              <p><strong>Velocidade:</strong> <span id="wind-speed">-</span></p>
+              <p><strong>Direção:</strong> <span id="wind-dir">-</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="middle-section" id="analise-solos">
+        <h2><i class="fas fa-vial"></i> Análise do Solo</h2>
+        <div class="info-cards" >
+          <div class="info-card">
+<!-- pH do Solo -->
+<h3><i class="fas fa-flask"></i> pH do Solo
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre pH do solo">i</span>
+    <span class="tooltip-text">Valor do pH e classificação (ácido, neutro, alcalino) — indica necessidade de calagem</span>
+  </div>
+</h3>
+            <p><strong>Valor:</strong> <span id="soil-ph">-</span></p>
+            <p><strong>Status:</strong> <span id="soil-ph-status">-</span></p>
+              <p><strong>Condutividade:</strong> <span id="soil-cond">-</span></p>
+
+          </div>
+          <div class="info-card">
+<!-- Umidade (solo) -->
+<h3><i class="fas fa-tint"></i> Umidade
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre umidade do solo">i</span>
+    <span class="tooltip-text">Nível de umidade do solo e sugestão de irrigação</span>
+  </div>
+</h3>            <p><strong>Ar:</strong> <span id="humidity">-</span></p>
+<p><strong>Solo:</strong> <span id="humidity-soil">-</span></p>
+            <p><strong>Status:</strong> <span id="soil-moisture-status">-</span></p>
+          </div>
+          <div class="info-card">
+<!-- Nutrientes -->
+<h3><i class="fas fa-atom"></i> Nutrientes
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre nutrientes do solo">i</span>
+    <span class="tooltip-text">Níveis de N, P e K — indica recomendações de adubação</span>
+  </div>
+</h3>            <p><strong>Nitrogênio:</strong> <span id="soil-n">-</span></p>
+            <p><strong>Fósforo:</strong> <span id="soil-p">-</span></p>
+            <p><strong>Potássio:</strong> <span id="soil-k">-</span></p>
+          </div>
+          <div class="info-card">
+<!-- Qualidade do Solo -->
+<h3><i class="fas fa-temperature-high"></i>Temperatura
+  <div class="tooltip-container">
+    <span class="tooltip" tabindex="0" aria-label="Informação sobre qualidade do solo">i</span>
+    <span class="tooltip-text">Matéria orgânica, textura e drenagem — impacto em produtividade</span>
+  </div>
+</h3>            <p><strong>Ar:</strong> <span id="temp-air">-</span></p>
+<p><strong>Solo:</strong> <span id="temp-soil">-</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" id="planta">
+        <label for="cropSelect">Consultar Planta Específica:</label>
+        <div class="form-group-inline" >
+          <select id="cropSelect">
+            <option value="" disabled selected>Selecione a planta</option>
+            <option value="tomate">Tomate</option>
+            <option value="milho">Milho</option>
+            <option value="soja">Soja</option>
+            <option value="alface">Alface</option>
+            <option value="feijao">Feijão</option>
+            <option value="cenoura">Cenoura</option>
+            <option value="batata">Batata</option>
+            <option value="trigo">Trigo</option>
+            <option value="arroz">Arroz</option>
+            <option value="mandioca">Mandioca</option>
+            <option value="café">Café</option>
+            <option value="banana">Banana</option>
+            <option value="laranja">Laranja</option>
+            <option value="uva">Uva</option>
+            <option value="morango">Morango</option>
+            <option value="abóbora">Abóbora</option>
+            <option value="melancia">Melancia</option>
+            <option value="pimentao">Pimentão</option>
+            <option value="repolho">Repolho</option>
+            <option value="beterraba">Beterraba</option>
+            <option value="cebola">Cebola</option>
+            <option value="pepino">Pepino</option>
+            <option value="abobrinha">Abobrinha</option>
+            <option value="couve">Couve</option>
+            <option value="almeirao">Almeirão</option>
+            <option value="espinafre">Espinafre</option>
+            <option value="rabanete">Rabanete</option>
+            <option value="quiabo">Quiabo</option>
+            <option value="mandioquinha">Mandioquinha</option>
+            <option value="batata-doce">Batata-doce</option>
+            <option value="amendoim">Amendoim</option>
+            <option value="girassol">Girassol</option>
+            <option value="ervilha">Ervilha</option>
+            <option value="grão-de-bico">Grão-de-bico</option>
+            <option value="lentilha">Lentilha</option>
+            <option value="aveia">Aveia</option>
+            <option value="cana-de-açúcar">Cana-de-açúcar</option>
+            <option value="mamão">Mamão</option>
+            <option value="melão">Melão</option>
+            <option value="pimenta">Pimenta</option>
+          </select>
+          <button id="recommendBtn" class="btn-secondary"><i class="fas fa-lightbulb"></i></button>
+        </div>
+      </div>
+
+      <div class="bottom-section">
+        <div class="card" id="calendario">
+          <h2><i class="fas fa-calendar-alt"></i> Calendário agrícola</h2>
+          <div class="result-box" id="calendarInfo">
+            <div class="empty-state">
+              <i class="fas fa-map-marked-alt"></i>
+              <p>Selecione sua localização para receber recomendações personalizadas de plantio</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="recomendacao">
+          <h2><i class="fas fa-leaf"></i> Recomendação de Plantio</h2>
+          <div class="result-box" id="recommendationResult">
+            <div class="empty-state">
+              <i class="fas fa-map-marked-alt"></i>
+              <p>Selecione sua localização para receber recomendações personalizadas de plantio</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- ./layout-container -->
+
+    <footer>
+        <p>Agrosense &copy; 2025 - Sistema Inteligente de Recomendação Agrícola</p>
+        <div class="footer-links">
+          <a href="sub/privacidade.html">Política de Privacidade</a>
+          <a href="sub/termos.html">Termos de Uso</a>
+          <a href="sub/contato.html">Contato</a>
+          <a href="sub/sobre.html">Sobre Nós</a>
+        </div>
+      </div>
+    </footer>
+  </div> <!-- ./container -->
+
+  <div class="chat-container">
+    <div class="chat-btn" id="chatToggle">
+      <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <h3><i class="fas fa-robot"></i> Assistente Agrícola</h3>
+        <button class="close-btn" id="closeChat">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="message bot-message">
+          Olá! Sou o SenseBot, seu assistente agrícola. Posso te ajudar com:
+          <ul style="margin-left: 20px; margin-top: 10px;">
+            <li>Dicas de plantio</li>
+            <li>Análise de solo</li>
+            <li>Recomendações personalizadas</li>
+          </ul>
+          Como posso ajudar? (Experimente falar comigo!)
+        </div>
+      </div>
+      <div class="chat-footer">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem...">
+        <button class="send-btn" id="sendChat"><i class="fas fa-paper-plane"></i></button>
+        <button class="mic-btn" id="micButton"><i class="fas fa-microphone"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="infoModal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Botão que ativa o robô (mantive à esquerda) -->
+ <button id="activateBot" title="Ativar Robô">
+  <i class="fas fa-leaf"></i>
+</button>
+
+
+  <!-- ---------- LOGIN e REGISTER POPUPS (apenas UMA cópia cada) ---------- -->
+  <!-- POPUP LOGIN -->
+<div id="loginPopupOverlay">
+  <div>
+    <button id="closeLoginPopup">X</button>
+
+    <h3>Login</h3>
+
+    <input id="loginUser" type="text" placeholder="Usuário">
+    <input id="loginPass" type="password" placeholder="Senha">
+
+    <button id="doLogin">Entrar</button>
+    <button id="doRegister">Cadastrar</button>
+
+    <div id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- POPUP CADASTRO -->
+<div id="registerPopupOverlay">
+  <div>
+    <button id="closeRegisterPopup">X</button>
+
+    <h3>Cadastro</h3>
+
+    <input id="registerName" type="text" placeholder="Nome completo">
+    <input id="registerUser" type="text" placeholder="Usuário">
+    <input id="registerPass" type="password" placeholder="Senha">
+    <input id="registerConfirmPass" type="password" placeholder="Confirmar senha">
+<span id="registerMsg"></span>
+
+    <button id="doCompleteRegister">Finalizar Cadastro</button>
+    <button id="backToLogin">Voltar para Login</button>
+
+    
+  </div>
+</div>
+
+
+
+<div id="historyPopupOverlay">
+  <div class="history-popup">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title">
+        <i class="fas fa-calendar-alt"></i>
+        <h1>Histórico</h1>
+      </div>
+      <p class="subtitle">Métricas coletadas</p>
+      <button id="closeHistoryPopup">X</button>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="content" id="historyContent"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p id="historyFooterText">0 registros encontrados</p>
+    </div>
+  </div>
+</div>
+  
+
+  <!-- ---------- POPUP DO ROBÔ (mini-card fixo, escondido por padrão) ---------- -->
+<div id="robotPopupWrapper" aria-hidden="true">
+  <div class="popup" id="robotPopup">
+    <!-- Botão de fechar -->
+    <button id="closeRobotPopup">X</button>
+
+    <button id="btnConectar">Conectar</button>
+  <p id="status">Conexão: <span>Carregando...</span></p>
+
+  
+
+ <button id="btnAnalise" onclick="extrairAnalise()">Extrair Análise</button>
+
+  </div>
+</div>
+
+
+<!-- Popup Marcar Ponto -->
+<div class="overlay" id="popupMarcar">
+  <div class="popup-box">
+
+    <button id="closePopup">X</button>
+
+    <h3>Marcar Ponto</h3>
+
+    <div id="campoCoordenadas">
+      <input type="text" id="inputLat" placeholder="Latitude">
+      <input type="text" id="inputLng" placeholder="Longitude">
+    
+      <button id="usarCoordenadas">Usar Coordenadas</button>
+      <button id="trocarMapa">Marcar no Mapa</button>
+    </div>
+
+    <div id="campoMapa" style="display:none;">
+      <p>Clique no mapa para marcar um ponto:</p>
+      <div id="mapaPopup"></div>
+      <br>
+      <button id="voltarCoords">Usar Coordenadas</button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+<script src="script.js" defer></script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
